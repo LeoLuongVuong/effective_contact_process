@@ -1,4 +1,3 @@
-#First I tried to make some changes
 
 #Input Arguments
 n<-1000                   # Population size

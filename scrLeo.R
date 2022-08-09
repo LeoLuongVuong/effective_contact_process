@@ -15,9 +15,43 @@ incubation.period<-function(lengthIP){
   return(time.max) 
 }
 
-infectious.period.length<-function(){
-  return(rgamma(1,shape = 32.14,scale = 0.47))#better to move to Gamma, e.g. Gamma with shape 26.01 scale 0.392 -> mean 10.2 and 2 sd
+#infectious.period.length<-function(){
+#  return(rgamma(1,shape = 32.14,scale = 0.47))#better to move to Gamma, e.g. Gamma with shape 26.01 scale 0.392 -> mean 10.2 and 2 sd
+#}
+
+
+nCov.InfMeasure.unvacc<-function(t){
+  vload.comp<-NULL
+  for (j in 1:length(t)){
+    if (t[j]>=1.7 & t[j]<=5.2){
+      vload.comp<-c(vload.comp,(5.514286*t[j]-49.37429+40)*0.00942063)
+    }
+    if (t[j]>5.2 & t[j]<=12.7){
+      vload.comp<-c(vload.comp,(-2.573333*t[j]-7.318667+40)*0.00942063)
+    }
+    if (t[j]<1.7 | t[j]>12.7){
+      vload.comp<-c(vload.comp,0)
+    }
+  }
+  return(vload.comp)
 }
+
+nCov.InfMeasure.vacc<-function(t){
+  vload.comp<-NULL
+  for (j in 1:length(t)){
+    if (t[j]>=2 & t[j]<=5.2){
+      vload.comp<-c(vload.comp,(6.09375*t[j]-52.1875+40)*0.01243202)
+    }
+    if (t[j]>5.2 & t[j]<=10.7){
+      vload.comp<-c(vload.comp,(-3.545455*t[j]-2.063636+40)*0.01243202)
+    }
+    if (t[j]<2 | t[j]>10.7){
+      vload.comp<-c(vload.comp,0)
+    }
+  }
+  return(vload.comp)
+}
+
 
 # Infectivity measure is set to represent viral load progression
 InfMeasure<-function(t,lengthIP){

@@ -143,7 +143,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
     testpositive.day<-status.matrix$TimePosTest
     #Identify the next event (the one that is realized first in time)
     ifelse(length(which(is.na(next.contact)==FALSE))>0,events$NextCtc<-min(next.contact, na.rm = T),events$NextCtc<-Inf) # among all the proposed social contact between households we select the minimum
-    ifelse(length(which(!is.infinite(testpositive.day)))>0,events$TestPositive<-min(testpositive.day),events$TestPositive<-Inf ) #
+    ifelse(length(which(!is.infinite(testpositive.day)))>0,events$TestPositive<-min(testpositive.day),events$TestPositive<-Inf ) # among all the test positive day we select the minimum
     ifelse(length(which(is.na(recovery.vector)==FALSE))>0,events$Recovery<-min(recovery.vector, na.rm = T),events$Recovery<-Inf) # among all the proposed social contact between households we select the minimum
 
     next.evts<-colnames(events)[which(min(events)==events)] # if two at the same time we pick one random

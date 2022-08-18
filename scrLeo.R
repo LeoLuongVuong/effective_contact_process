@@ -8,7 +8,7 @@
 # The following functions are set to describe the spreading of SARS-CoV-2
 
 # We compute the day of symptom onset as the peak of the infectivity measure
-incubation.period<-function(lengthIP){
+incubation.period<-function(lengthIP){ #why incubation period? Is lengthIP the length of infectious period? Is infectious period the period that an infected individual has the potential of infecting others?
   time.points<-seq(0,lengthIP,0.01)
   infectiousnessmeasure.values<-(15/lengthIP)*dgamma(15/lengthIP*time.points, shape =12 , scale =0.48 )
   time.max<-time.points[which(infectiousnessmeasure.values==max(infectiousnessmeasure.values))] 

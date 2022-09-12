@@ -8,9 +8,9 @@
 # The following functions are set to describe the spreading of SARS-CoV-2
 
 # We compute the day of symptom onset as the peak of the infectivity measure
-incubation.period<-function(lengthIP){ #why incubation period? Is lengthIP the length of infectious period? Is infectious period the period that an infected individual has the potential of infecting others?
+incubation.period<-function(lengthIP){ 
   time.points<-seq(0,lengthIP,0.01)
-  infectiousnessmeasure.values<-(15/lengthIP)*dgamma(15/lengthIP*time.points, shape =12 , scale =0.48 )
+  infectiousnessmeasure.values<-(15/lengthIP)*dgamma(15/lengthIP*time.points, shape =12 , scale =0.48 ) #viral-loads
   time.max<-time.points[which(infectiousnessmeasure.values==max(infectiousnessmeasure.values))] 
   return(time.max) 
 }
@@ -74,7 +74,8 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
                               TimeSymptomOnset  = Inf,      # symptom onset date
                               IPLength          = NA,       # length of infectious period
                               Recovery          = Inf,      # recovery time 
-                              TimePosTest       = Inf)      # time at which the test gives positive result
+                              TimePosTest       = Inf,      # time at which the test gives positive result
+                              Vaccinated        = -1  )     # Vaccination/immunization status: 1 vaccinated/immunized, 0 not            
   
   
   

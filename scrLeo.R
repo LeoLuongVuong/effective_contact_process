@@ -115,11 +115,11 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
           status.matrix$TimePosTest[first]<-status.matrix$TimeSymptomOnset[first]+test.delay #assume only symptomatic individuals are tested (Leo add)
         }
       }
-      time.events<-rbind(time.events,c(current.time,1.1,first)) #what is time.events, why 1.1? (Leo ask)
+      time.events<-rbind(time.events,c(current.time,1.1,first)) #1.1 represents a symptomatic infection event
     }else{
       status.matrix$severity[first]<-2
       transmission.parameters$q[first]<-transmission.parameters$q[first]*alpha.as 
-      time.events<-rbind(time.events,c(current.time,1.2,first)) #what is time.events, why 1.2? (Leo ask)
+      time.events<-rbind(time.events,c(current.time,1.2,first)) #1.2 represents an asymptomatic infection event
     }
     infectives[first]<-1
     contact.time$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate[first])+current.time       # Generate the next inter-arrival time for individual i #Is this the time of the next contact? (Leo ask)
@@ -147,14 +147,14 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
     ifelse(length(which(is.na(next.contact)==FALSE))>0,events$NextCtc<-min(next.contact, na.rm = T),events$NextCtc<-Inf) # among all the proposed social contact between households we select the minimum
     ifelse(length(which(!is.infinite(testpositive.day)))>0,events$TestPositive<-min(testpositive.day),events$TestPositive<-Inf ) # among all the test positive day we select the minimum
     
-    next.evts<-colnames(events)[which(min(events)==events)] # if two at the same time we pick one random
+    next.evts<-colnames(events)[which(min(events)==events)] # if two at the same time we pick one random #Not sure what this line is (Leo ask)
     if (length(next.evts)>1){
       next.evts<-sample(colnames(events)[which(min(events)==events)],1)
     }
     
     if (next.evts=="NextCtc"){
       current.time<-events$NextCtc
-      if (length(min(contact.time, na.rm = T))>1){ #when two contacts happen at the same time we select one at random
+      if (length(min(contact.time, na.rm = T))>1){ #when two contacts happen at the same time we select one at random #Not sure what this mean
         infector<-sample(which(contact.time==current.time),1) 
         infectee<-sample(setdiff(1:n,infector),1)
         index.contact[infector]<-1

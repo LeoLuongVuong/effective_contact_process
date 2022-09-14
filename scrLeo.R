@@ -52,13 +52,6 @@ nCov.InfMeasure.vacc<-function(t){
   return(vload.comp)
 }
 
-
-# Infectivity measure is set to represent viral load progression
-InfMeasure<-function(t,lengthIP){
-  vload.comp<-(15/lengthIP)*dgamma(15/lengthIP*t, shape = 12, scale = 0.48) #5.7 GT without interventions
-  return(vload.comp)
-}
-
 #########################3
 # Simulating Function
 #########################3
@@ -67,7 +60,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
   
   
   
-  status.matrix <- data.frame(infected          = rep(0,n), # status variable: indicate if individuals are infectious (1), susceptible (2) or recovered (3)
+  status.matrix <- data.frame(infected          = rep(0,n), # status variable: indicate if individuals are infectious (1), susceptible (0) or recovered (-1)
                               time.of.infection = NA,       # time of infection
                               infector          = NA,       # infector
                               severity          = -1,       # severity: 1 symptomatic infection, 2 asymptomatic infection

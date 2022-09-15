@@ -79,8 +79,8 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
   index.contact<-rep(0,n) # vector that selects the individuals that have to propose a new social contact (global) - 1 yes 0 no
   time.events<-matrix(NA,1,3)
   
-  #transmission parameter dataframe: each line is an individual, the first column is the transmission coefficient and the third is the length of IP (needed to re-scale Viral load curve)
-  transmission.parameters<-data.frame("id"=1:n,"q"=rep(q,n),"contact_rate"=rep(lambda,n))   #matrix containing the proposed time of the next contact (first column) and the contact individual (second column)
+  #transmission parameter dataframe: each line is an individual, the first column is the transmission coefficient and the second is the contact rate
+  transmission.parameters<-data.frame("id"=1:n,"q"=rep(q,n),"contact_rate"=rep(lambda,n))   
   
   #Proportion of immune
   if (prop.immune>0){
@@ -124,8 +124,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
   recovered<-0
   err<-0
   
-  #When only the first pathogen is present #what is this (Leo ask)
-  while((sum(infectives))>0){ #while there are still infectives
+    while((sum(infectives))>0){ #while there are still infectives
     #Phase 1: individuals that has to, propose a new social contact
     for (i in which(index.contact==1) ){ # for all the individuals that has to propose a global contact    #why 1 because previously we assign index.contact to 0 (Leo ask)
       contact.time$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate[i])+current.time# I generate the next interarrival time for individual i
@@ -211,7 +210,6 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
     }
   }
   
-  #When also the other pathogen is present.
   time.events<-time.events[-1,]
   timev.name<-c("time","event","who")
   dimnames(time.events)<-list(NULL,timev.name)

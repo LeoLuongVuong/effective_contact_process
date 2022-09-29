@@ -15,9 +15,9 @@ incubation.period<-function(lengthIP){
   return(time.max) 
 }
 
-#infectious.period.length<-function(){
-#  return(rgamma(1,shape = 32.14,scale = 0.47))#better to move to Gamma, e.g. Gamma with shape 26.01 scale 0.392 -> mean 10.2 and 2 sd
-#}
+infectious.period.length<-function(){
+return(rgamma(1,shape = 32.14,scale = 0.47))#better to move to Gamma, e.g. Gamma with shape 26.01 scale 0.392 -> mean 10.2 and 2 sd
+}
 
 
 nCov.InfMeasure.unvacc<-function(t){
@@ -68,7 +68,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
                               IPLength          = NA,       # length of infectious period
                               Recovery          = Inf,      # recovery time 
                               TimePosTest       = Inf,      # time at which the test gives positive result
-                              Vaccinated        = -1  )     # Vaccination/immunization status: 1 vaccinated/immunized, 0 not            
+                              Vaccinated        = 0)        # Vaccination status: 1 vaccinated, 0 unvaccinated            
   
   
   
@@ -82,16 +82,18 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
   #transmission parameter dataframe: each line is an individual, the first column is the transmission coefficient and the second is the contact rate
   transmission.parameters<-data.frame("id"=1:n,"q"=rep(q,n),"contact_rate"=rep(lambda,n))   
   
-  #Proportion of immune
+  #Proportion of immune/vaccination
   if (prop.immune>0){
     status.matrix$infected[sample(1:n,round(prop.immune*n))]<--2 #-2 means they are immuned
   }
-  
+  if (status.matrix$infected[i]==-2){ #all people are immuned through vaccination #is this necessarily true?
+    status.matrix$Vaccinated[i]==1
+  }
   testpositive.day<-rep(Inf,n)
   contact.time<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (first column) and the contact individual (second column)
   
   # first infected: randomly chosen in the population (among the susceptibilities)
-  first.cases<-sample(which(status.matrix$infected==0),nSeeds)
+  first.cases<-sample(which(status.matrix$infected==0),nSeeds) #those who are immune can get infected or not?
     
   # update the infectious status and epidemiological characteristics of the seeded cases  
   for (j in first.cases){
@@ -149,7 +151,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
       if (length(min(contact.time, na.rm = T))>1){ #when two contacts happen at the same time we select one at random 
         infector<-sample(which(contact.time==current.time),1) 
         infectee<-sample(setdiff(1:n,infector),1)
-        index.contact[infector]<-1
+        index.contact[infector]<-1 #infectors are thet one who have to propose a new contact
         contact.time$pr.ctc[infector]<-NA
       }else{
         infector<-which(contact.time$pr.ctc ==events$NextCtc)

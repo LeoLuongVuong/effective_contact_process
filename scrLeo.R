@@ -7,18 +7,13 @@
 
 # The following functions are set to describe the spreading of SARS-CoV-2
 
-# We compute the day of symptom onset as the peak of the infectivity measure
-incubation.period<-function(lengthIP){ 
-  time.points<-seq(0,lengthIP,0.01)
-  infectiousnessmeasure.values<-(15/lengthIP)*dgamma(15/lengthIP*time.points, shape =12 , scale =0.48 ) #viral-loads
-  time.max<-time.points[which(infectiousnessmeasure.values==max(infectiousnessmeasure.values))] 
-  return(time.max) 
-}
+#infectious period length
 
 infectious.period.length<-function(){
 return(rgamma(1,shape = 32.14,scale = 0.47))#better to move to Gamma, e.g. Gamma with shape 26.01 scale 0.392 -> mean 10.2 and 2 sd
 }
 
+# infectivity measures for vaccinated and unvaccinated individuals
 
 nCov.InfMeasure.unvacc<-function(t){
   vload.comp<-NULL
@@ -52,11 +47,27 @@ nCov.InfMeasure.vacc<-function(t){
   return(vload.comp)
 }
 
+# We compute the day of symptom onset as the peak of the infectivity measure fpr vaccinated and unvaccinated individuals
+
+incubation.period.vacc<-function(lengthIP){ 
+  time.points<-seq(0,lengthIP,0.01)
+  infectiousnessmeasure.values<-nCov.InfMeasure.vacc(time.points) #viral-loads
+  time.max<-time.points[which(infectiousnessmeasure.values==max(infectiousnessmeasure.values))] 
+  return(time.max) 
+}
+
+incubation.period.unvacc<-function(lengthIP){ 
+  time.points<-seq(0,lengthIP,0.01)
+  infectiousnessmeasure.values<-nCov.InfMeasure.unvacc(time.points) #viral-loads
+  time.max<-time.points[which(infectiousnessmeasure.values==max(infectiousnessmeasure.values))] 
+  return(time.max) 
+}
+
 #########################3
 # Simulating Function
 #########################3
 
-sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.delay,contact.reduction,lambda,nSeeds){
+sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens,test.delay,contact.reduction,lambda,nSeeds){
   
   
   
@@ -84,11 +95,10 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
   
   #Proportion of immune/vaccination
   if (prop.immune>0){
-    status.matrix$infected[sample(1:n,round(prop.immune*n))]<--2 #-2 means they are immuned
-  }
-  if (status.matrix$infected[i]==-2){ #all people are immuned through vaccination #is this necessarily true?
-    status.matrix$Vaccinated[i]==1
-  }
+    #status.matrix$infected[sample(1:n,round(prop.immune*n))]<--2 #-2 means they are immune # We drop this such that there's no immune individual
+    status.matrix$Vaccinated[sample(1:n,round(prop.immune*n))]<-1
+    }
+    
   testpositive.day<-rep(Inf,n)
   contact.time<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (first column) and the contact individual (second column)
   
@@ -100,11 +110,20 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
     first<-j
     status.matrix$infected[first] <- 1 
     status.matrix$time.of.infection[first] <- 0
-    status.matrix$IPLength[first]<-infectious.period.length() #need to be distinguished between vaccinated and unvaccinated individuals (Leo add)
+  
+  #if (status.matrix$Vaccinated[first]<-1){ #if a person is vaccinated  
+    #status.matrix$IPLength[first]<-infectious.period.length()*vaccine.effectiveness #need to be distinguished between vaccinated and unvaccinated individuals (Leo add)
+  #}else{
+    status.matrix$IPLength[first]<-infectious.period.length()
+  #}
     status.matrix$Recovery[first]<-current.time+status.matrix$IPLength[first]
     if (runif(1)<rho){ #if symptomatic
       status.matrix$severity[first]<-1
-      status.matrix$TimeSymptomOnset[first]<-current.time+incubation.period(status.matrix$IPLength[first])
+      if(status.matrix$Vaccinated[first]==1){ #if vaccinated
+      status.matrix$TimeSymptomOnset[first]<-current.time+incubation.period.vacc(status.matrix$IPLength[first])
+      }else{
+        status.matrix$TimeSymptomOnset[first]<-current.time+incubation.period.unvacc(status.matrix$IPLength[first])
+      }
       if (runif(1)<testing.prob){ #a patient is tested (Leo add)
         if (runif(1)<test.sens){ #the test is positive (Leo add)
           status.matrix$TimePosTest[first]<-status.matrix$TimeSymptomOnset[first]+test.delay #assume only symptomatic individuals are tested (Leo add)
@@ -160,7 +179,11 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
         contact.time$pr.ctc[infector]<-NA
       }
       inf.ctc<-transmission.parameters$q[infector]
-      acc.rate<-InfMeasure(t=(current.time-status.matrix$time.of.infection[infector]), lengthIP = status.matrix$IPLength[infector])*inf.ctc
+      if (status.matrix$Vaccinated[infector]==1){
+      acc.rate<-nCov.InfMeasure.vacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff)
+      }else{
+        acc.rate<-nCov.InfMeasure.unvacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc
+      }
       if (status.matrix$infected[infector]!=1){acc.rate<-0}
       if (acc.rate>1){err<-err+1}
       if (status.matrix$infected[infectee]==0 & runif(1)<acc.rate){
@@ -171,7 +194,11 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,testing.prob,test.sens,test.del
         status.matrix$Recovery[infectee]<-current.time+status.matrix$IPLength[infectee]
         if (runif(1)<rho){ #if symptomatic
           status.matrix$severity[infectee]<-1
-           status.matrix$TimeSymptomOnset[infectee]<-current.time+incubation.period(status.matrix$IPLength[infectee])
+          if(status.matrix$Vaccinated[infectee]==1){ #if vaccinated
+           status.matrix$TimeSymptomOnset[infectee]<-current.time+incubation.period.vacc(status.matrix$IPLength[infectee])
+          }else{
+            status.matrix$TimeSymptomOnset[infectee]<-current.time+incubation.period.unvacc(status.matrix$IPLength[infectee])
+          }
           if (runif(1)<testing.prob){
             if (runif(1)<test.sens){
                status.matrix$TimePosTest[infectee]<-status.matrix$TimeSymptomOnset[infectee]+test.delay

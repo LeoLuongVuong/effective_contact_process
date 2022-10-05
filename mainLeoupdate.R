@@ -14,7 +14,7 @@ lambda<-5                 # Number of daily contacts
 
 #running simulations
 source("scrLeo.R")
-nSim<-50
+nSim<-10
 set.seed(131714)
 epi.outbreak<-list()
 for (i in 1:nSim){

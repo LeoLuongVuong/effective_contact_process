@@ -1,10 +1,11 @@
 
 #Input Arguments
 n<-1000                   # Population size
-prop.immune <-0           # Proportion of immune individuals
+prop.immune <-0.7         # Proportion of immune individuals
 rho <-0.4                 # Probability of a symptomatic infection
 q <-0.5                   # Transmission potential
 alpha.as<- 0.1            # Relative infectiousness asymptomatic carriers
+vacc.eff<- 0.1            # Vaccine effectiveness
 testing.prob<-1           # Probability that a symptomatic individual is tested
 test.sens<-0.9            # Sensitivity of the test
 test.delay<-1             # Delay from taking the test to the test result
@@ -19,7 +20,7 @@ set.seed(131714)
 epi.outbreak<-list()
 for (i in 1:nSim){
   print(i)
-  epi.outbreak[[i]]<-sim.ekp(n=n,prop.immune = prop.immune,rho = rho,q=q,alpha.as = alpha.as,testing.prob = testing.prob,test.sens = test.sens,test.delay = test.delay,contact.reduction = contact.reduction,nSeeds = nSeeds, lambda = lambda)
+  epi.outbreak[[i]]<-sim.ekp(n=n,prop.immune = prop.immune,rho = rho,q=q,alpha.as = alpha.as,vacc.eff=vacc.eff,testing.prob = testing.prob,test.sens = test.sens,test.delay = test.delay,contact.reduction = contact.reduction,nSeeds = nSeeds, lambda = lambda)
 }
 
 

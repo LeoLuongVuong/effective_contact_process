@@ -62,8 +62,8 @@ boxplot(PeakPrevalence, ylab="Peak Prevalence")
 
 
 # Save Simulations
+setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts/Simulations and Rhistory")
 name<-paste("EpiOutbreak", "_N",n,"_nSeeds",nSeeds,"_PropImm",prop.immune,"_rho",rho,"_q",q,"_alpha",alpha.as,"_testingProb",testing.prob,"_testSens",test.sens,"_testdelay",test.delay,"_contact reduction",contact.reduction,sep = "")
-setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts/effective_contact_process")
 save(epi.outbreak, file = paste(name,".RData",sep = ""))
-
+setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts/effective_contact_process")
 

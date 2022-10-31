@@ -161,7 +161,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens
     ifelse(length(which(!is.infinite(testpositive.day)))>0,events$TestPositive<-min(testpositive.day),events$TestPositive<-Inf ) # among all the test positive day we select the minimum
     
     next.evts<-colnames(events)[which(min(events)==events)] # if two at the same time we pick one random 
-    if (length(next.evts)>1){ #how the length can be >1 when every column is the min of a vector (Leo ask)
+    if (length(next.evts)>1){ 
       next.evts<-sample(colnames(events)[which(min(events)==events)],1)
     }
     

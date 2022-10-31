@@ -1,11 +1,11 @@
 
 #Input Arguments
 n<-1000                   # Population size
-prop.immune <-0.7         # Proportion of immune individuals
-rho <-0.4                 # Probability of a symptomatic infection
+prop.immune <-0.4         # Proportion of immune individuals
+rho <-0.8                 # Probability of symptomatic infection
 q <-0.5                   # Transmission potential
 alpha.as<- 0.1            # Relative infectiousness asymptomatic carriers
-vacc.eff<- 0.1            # Vaccine effectiveness
+vacc.eff<- 0.4            # Vaccine effectiveness (against infectiousness and susceptibility to infection)
 testing.prob<-1           # Probability that a symptomatic individual is tested
 test.sens<-0.9            # Sensitivity of the test
 test.delay<-1             # Delay from taking the test to the test result
@@ -15,7 +15,7 @@ lambda<-5                 # Number of daily contacts
 
 #running simulations
 source("scrLeo.R")
-nSim<-10
+nSim<-50
 set.seed(131714)
 epi.outbreak<-list()
 for (i in 1:nSim){
@@ -63,7 +63,7 @@ boxplot(PeakPrevalence, ylab="Peak Prevalence")
 
 # Save Simulations
 name<-paste("EpiOutbreak", "_N",n,"_nSeeds",nSeeds,"_PropImm",prop.immune,"_rho",rho,"_q",q,"_alpha",alpha.as,"_testingProb",testing.prob,"_testSens",test.sens,"_testdelay",test.delay,"_contact reduction",contact.reduction,sep = "")
-setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts")
+setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts/effective_contact_process")
 save(epi.outbreak, file = paste(name,".RData",sep = ""))
 
 

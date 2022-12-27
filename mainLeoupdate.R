@@ -12,6 +12,7 @@ test.delay<-1             # Delay from taking the test to the test result
 contact.reduction<-0.1    # Reduction of contact rate
 nSeeds<-3                 # Number initial infected individuals
 lambda<-5                 # Number of daily contacts
+contact.difference <- 2   # the difference in number of contacts between vaccinated and vaccinated individuals #Here we assume those who are vaccinated tend to make more contact than those unvaccinated       
 
 #running simulations
 source("scrLeo.R")

@@ -67,7 +67,7 @@ nCov.InfMeasure.vacc<-function(t){
 # Simulating Function
 #########################3
 
-sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens,test.delay,contact.reduction,lambda,nSeeds){
+sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens,test.delay,contact.reduction,contact.difference,lambda,nSeeds){
   
   
   
@@ -183,7 +183,7 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens
       if (length(min(contact.time, na.rm = T))>1){ #when two contacts happen at the same time we select one at random 
         infector<-sample(which(contact.time==current.time),1) 
         infectee<-sample(setdiff(1:n,infector),1)
-        index.contact[infector]<-1 #infectors are thet one who have to propose a new contact
+        index.contact[infector]<-1 #infectors are the one who have to propose a new contact
         contact.time$pr.ctc[infector]<-NA
       }else{
         infector<-which(contact.time$pr.ctc ==events$NextCtc)
@@ -193,12 +193,18 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens
       }
       inf.ctc<-transmission.parameters$q[infector]
       if (status.matrix$Vaccinated[infector]==1){
-        acc.rate<-nCov.InfMeasure.vacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff) # this accouns for vaccine effectiveness against infectiousness
-      }else if(status.matrix$Vaccinated[infectee]==1){
-              acc.rate<-nCov.InfMeasure.unvacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff) # this accouns for vaccine effectiveness against susceptibility to infection
+        if (status.matrix$Vaccinated[infectee]==1){
+                acc.rate<-nCov.InfMeasure.vacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff)^2 # both infector and infectee are vaccinated, therefore needs to account for both vaccine effectiveness against infectiousness and vaccine effectiveness against susceptibility
       }else{
-        acc.rate<-nCov.InfMeasure.unvacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc # when either of the infector or infectee is vaccinated
+              acc.rate<-nCov.InfMeasure.vacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff) # this accouns for vaccine effectiveness against infectiousness
       }
+              }else{
+                      if (status.matrix$Vaccinated[infectee]==1){
+                              acc.rate<-nCov.InfMeasure.unvacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc*(1-vacc.eff) # this accouns for vaccine effectiveness against susceptibility to infection  
+                      }else{
+                                acc.rate<-nCov.InfMeasure.unvacc(t=current.time-status.matrix$time.of.infection[infector])*inf.ctc # when either of the infector or infectee is vaccinated
+                      }
+              }
       if (status.matrix$infected[infector]!=1){acc.rate<-0}
       if (acc.rate>1){err<-err+1}
       if (status.matrix$infected[infectee]==0 & runif(1)<acc.rate){

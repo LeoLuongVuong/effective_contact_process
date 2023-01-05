@@ -95,11 +95,12 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens
   
   #Proportion of immune/vaccination
   if (prop.immune>0){
-    #status.matrix$infected[sample(1:n,round(prop.immune*n))]<--2 #-2 means they are immune # We drop this such that there's no immune individual
+    #status.matrix$infected[sample(1:n,round(prop.immune*n))]<--2 #-2 means they are immune # We drop this such that there's no immune individual (no perfect immunization and we assume everyone in the population is susceptible)
     status.matrix$Vaccinated[sample(1:n,round(prop.immune*n))]<-1
   }
   
- for (i in 1:n) {       #Here we assume that all vaccinated individuals has the same IP Length of 10.7 days and 12.7 days for those unvaccinated 
+  #We assume that all vaccinated individuals has the same IP Length of 10.7 days and 12.7 days for those unvaccinated 
+   for (i in 1:n) {       
          if (status.matrix$Vaccinated[i]==1){
                  status.matrix$IPLength[i]<-10.7
          } else {
@@ -107,11 +108,18 @@ sim.ekp<-function(n,prop.immune, rho,q, alpha.as,vacc.eff,testing.prob,test.sens
          }
  }
   
+  #We also assume that vaccinated individual's contact rate is contact.difference times the unvaccinated one's
+  for (i in 1:n) {       
+          if (status.matrix$Vaccinated[i]==1){
+                  transmission.parameters$contact_rate[i]<-transmission.parameters$contact_rate[i]*contact.difference
+          } 
+  }
+  
   testpositive.day<-rep(Inf,n)
   contact.time<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (first column) and the contact individual (second column)
   
   # first infected: randomly chosen in the population (among the susceptibilities)
-  first.cases<-sample(which(status.matrix$infected==0),nSeeds) #those who are immune can get infected or not?
+  first.cases<-sample(which(status.matrix$infected==0),nSeeds) 
     
   # update the infectious status and epidemiological characteristics of the seeded cases  
   for (j in first.cases){

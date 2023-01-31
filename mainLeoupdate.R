@@ -12,7 +12,7 @@ test.delay<-1             # Delay from taking the test to the test result
 contact.reduction<-0.2    # Reduction of contact rate
 nSeeds<-3                 # Number initial infected individuals
 lambda<-15                # Number of daily contacts
-contact.difference <- 2   # the difference in number of contacts between vaccinated and vaccinated individuals #Here we assume those who are vaccinated tend to make more contact than those unvaccinated       
+contact.difference <- 4   # the difference in number of contacts between vaccinated and vaccinated individuals #Here we assume those who are vaccinated tend to make more contact than those unvaccinated       
 
 #running simulations
 source("scrLeo.R")
@@ -32,17 +32,17 @@ for (i in 1:nSim){
 setwd("D:/Hoc/Uantwerp/Infectious Disease Modelling Internship/scripts/Simulations and Rhistory")
 single.ep<-epi.outbreak[[sample(1:nSim,1)]]
 
-tiff('Prevalence_single_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('Prevalence_single_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 plot(single.ep$epi.evo$Days, single.ep$epi.evo$Prevalence, type="l", xlab = "Days", ylab = "Prevalence")
 dev.off()
 
-tiff('Incidence_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('Incidence_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 plot(single.ep$epi.evo$Days, single.ep$epi.evo$Incidence, col="red", xlab = "Days", ylab = " Incidence")
 dev.off()
 
-tiff('Eff_Rep_Num_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('Eff_Rep_Num_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 plot(single.ep$epi.evo$Days, single.ep$epi.evo$Rt, col="blue", ylab = "Effective Reproductive Number", xlab = "Days" )
 dev.off()
@@ -52,9 +52,9 @@ n.epidemics<-10 #Number of epidemics you want to consider
 epidemics<-sample(1:nSim,n.epidemics) #Make sure you are selecting a number of epidemics smaller than the number of simulations
 
 
-tiff('Prevalence_multiple_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('Prevalence_multiple_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
-plot(epi.outbreak[[epidemics[1]]]$epi.evo$Days, epi.outbreak[[epidemics[1]]]$epi.evo$Prevalence, type="l", xlab = "Days", ylab = "Prevalence", xlim = c(0,70),ylim = c(0,250)) # you need to adjust the x and y axis, to see all the epidemics. To do so adjust xlim and ylim
+plot(epi.outbreak[[epidemics[1]]]$epi.evo$Days, epi.outbreak[[epidemics[1]]]$epi.evo$Prevalence, type="l", xlab = "Days", ylab = "Prevalence", xlim = c(0,40),ylim = c(0,85)) # you need to adjust the x and y axis, to see all the epidemics. To do so adjust xlim and ylim
 for (i in 1:n.epidemics){
   lines(epi.outbreak[[epidemics[i]]]$epi.evo$Days, epi.outbreak[[epidemics[i]]]$epi.evo$Prevalence, col=i)
 }
@@ -73,17 +73,17 @@ for (i in 1:nSim){
   PeakPrevalence<-c(PeakPrevalence,epi.outbreak[[i]]$PeakPrevalence$PeakPrevalence)
 }
 
-tiff('Finalsize_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('Finalsize_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 boxplot(FinalSize, ylab="Final Size")
 dev.off()
 
-tiff('PeakIncidence_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('PeakIncidence_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 boxplot(PeakIncidence, ylab="Peak Incidence")
 dev.off()
 
-tiff('PeakPrevalence_rho0.2.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
+tiff('PeakPrevalence_contact.difference4.tiff', units="in", width=5, height=4, res=100, compression = 'lzw')
 par(mai=c(0.8,0.8,0.1,0.1))
 boxplot(PeakPrevalence, ylab="Peak Prevalence")
 dev.off()
